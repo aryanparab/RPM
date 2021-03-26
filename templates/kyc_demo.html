@@ -1,0 +1,13 @@
+{% extends "home_demo.html" %}
+{% block content %}
+<h3>Upload Files</h3>
+<form action ="/kyc" method="POST" enctype="multipart/form-data">
+<label for="aadhar">Aadhar_card </label>
+    <input type="file" name="aadhar" >
+    <br>
+    <button type="submit">Submit</button>
+</form>
+{% if context != '' %}
+<h5>{{context}}</h5>
+{% endif %}
+{% endblock %}
