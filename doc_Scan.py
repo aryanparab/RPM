@@ -25,7 +25,7 @@ def getContours(img):
                 biggest = approx
                 maxArea = area
 
-    cv2.drawContours(imgContour, biggest , -1,(255,0,0),20)
+    #cv2.drawContours(imgContour, biggest , -1,(255,0,0),20)
     return biggest
 
 def preProcessing(img):
@@ -64,8 +64,8 @@ def getWarp(img,biggest):
 
     return imgCropped
 
-while True:
-    img= cv2.imread('img2.jpeg')
+if __name__ == '__main__':
+    img= cv2.imread('adhar.jpeg')
     cv2.resize(img,(widthImg,heightImg))
     imgContour = img.copy()
 
