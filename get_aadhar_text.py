@@ -5,52 +5,35 @@ pytesseract.pytesseract.tesseract_cmd=r'C:\Program Files\Tesseract-OCR\tesseract
 
 def get_data(img_file):
 	def get_text(imgfile):
-	    grayimg = cv2.imread(imgfile)
-	    grayimg=cv2.cvtColor(grayimg, cv2.COLOR_BGR2GRAY)
-	    kernel = np.ones((1, 1), np.uint8)
-	    img = cv2.dilate(grayimg, kernel, iterations=1)
-	    img = cv2.erode(img, kernel, iterations=1)
-	    th , img = cv2.threshold(img,127,225,cv2.THRESH_TRUNC)
+	    img = cv2.imread(imgfile)
+	    grayimg=cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	    tempfile = "{}.png".format(os.getpid())
-	    cv2.imwrite(tempfile, img)
+	    cv2.imwrite(tempfile, grayimg)
 	    text = pytesseract.image_to_string(Image.open(tempfile))
-	    text = re.sub(r'^[a-zA-z1-9]','',text)
 	    os.remove(tempfile)
 	    return text
 
 	def getEno(text):
-	    start=end=text.find('Enrollment No.: ')+len('Enrollment No.: ')
-	    while (text[end]!='\n'):
-	        end+=1
-	    return text[start:end]   
+	    x=re.findall('[0-9]{4}\/[0-9]{5}\/[0-9]{5}',text)
+	    if len(x)>0:
+	        return x[0]
 
 	def getPhone(text):
-		try:
-		    if text.find('Mobile No: ')!=-1:
-		        start=text.find('Mobile No: ')+ len('Mobile No: ')
-		        return text[start:start+10]
-		    else:
-		        return re.findall(r'(?<!\d)\d{10}(?!\d)',text)[0]
-		except:
-			return ''
+	    x=re.findall(r'[0-9]{10}',text)
+	    return x[len(x)-1]
 
 	def getAno(text):
-	    start=end=text.find('Your Aadhaar No. :\n\n')+len('Your Aadhaar No. :\n\n')
-	    while (text[end]!='\n'):
-	        end+=1
-	    return text[start:end]
+	    return re.findall('[0-9]{4}[ ][0-9]{4}[ ][0-9]{4}',text)[0]
 
 	def getDOB(text):
-	    start=end=text.find('DOB : ')+len('DOB : ')
-	    while (text[end]!='\n'):
-	        end+=1
-	    return text[start:end]
+	    x=re.findall('[0-9]{2}\/[0-9]{2}\/[0-9]{4}',text)
+	    return x[len(x)-1]
 
 	def getGender(text):
-	    if text.find('Male\n\n')!=-1:
-	        return 'Male'
-	    else:
+	    if text.find('Male\n')==-1 and text.find('MALE\n')==-1 :
 	        return 'Female'
+	    else:
+	        return 'Male'
 
 	imgfile=img_file
 	text=get_text(imgfile)

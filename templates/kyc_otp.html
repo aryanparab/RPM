@@ -1,0 +1,11 @@
+{% extends 'home.html' %}
+{% block content %}
+<form action="/otpgenerate" method="POST">
+	<label for='otp'>Enter OTP sent on number {{ no }} : </label>
+	<input type="text" name =  "otp">
+	 <button type="submit" class="btn btn-primary btn-block">VERIFY</button>
+</form>
+{% if context != '' %}
+                <h5>{{context}}</h5>
+                {% endif %}
+{% endblock %}
