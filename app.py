@@ -42,13 +42,14 @@ def check_video_face():
 @app.route("/kyc",methods=['POST','GET'])
 def check_kyc():
 	if request.method == "POST":
-		f = request.files["aadhar"]
+		f_aadhar = request.files["aadhar"]
 
-		if f == '' :
+		if f_aadhar == '' :
 			return render_template('kyc_demo.html',context='Please upload a file')
 		
-		elif check_fileextension(f.filename):
-			f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
+		elif check_fileextension(f_aadhar.filename):
+			f_aadhar.filename = 'aadhar'+'.'+f_aadhar.filename.split('.')[1]
+			f_aadhar.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f_aadhar.filename)))
 			
 			return redirect(url_for('check_video_face'))
 		
