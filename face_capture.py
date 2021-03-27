@@ -35,7 +35,7 @@ def perform():
             face = cv2.resize(face_extraction(img),(224,224))
             
             file_name= str(count)+'.jpg'
-            if count <150 :
+            if count < 40 :
                 file_name_path = os.path.join(BASE_DIR,'faces','train','person',file_name)
             #'C:/Users/parab/Desktop/python/opencv/images/face_recog_train/aryan/'
             else:
@@ -50,7 +50,7 @@ def perform():
             pass
         
         
-        if cv2.waitKey(1) == 1000 or count == 200:
+        if cv2.waitKey(1) == 1000 or count == 60:
             break
 
     cap.release()

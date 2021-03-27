@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 import face_capture
 import model
 import get_aadhar_text
+import cv2
 
 app = Flask(__name__)
 
@@ -19,7 +20,24 @@ if os.path.isdir(os.path.join(BASE_DIR,file_to_store_upload_docs)) != True :
 UPLOAD_FOLDER= os.path.join(BASE_DIR,file_to_store_upload_docs)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
-file_dict ={0:'aadhar',1:'pan',2:'dl'}
+file_dict ={0:'aadhar',1:'passport',2:'pan',3:'dl'}
+
+
+face_classifier = cv2.CascadeClassifier('haarcasacde_facefrontal_default.xml')
+def face_extraction(img):
+    faces = face_classifier.detectMultiScale(img,1.3,5)
+        
+    if faces is ():
+        print("no face")
+        return None
+        
+    for (x,y,w,h) in faces :
+        x=x-10
+        y=y-10
+        cropped_face = img[y:y+h+50 , x:x+w+50]
+            
+    return cropped_face
+
 
 @app.route("/")
 def home_page():
@@ -47,23 +65,28 @@ def check_fileextension(file):
 def check_kyc():
 	if request.method == "POST":
 		f_aadhar = request.files["aadhar"]
+		f_passport = request.files["passport"]
 		f_pan = request.files["pan"]
 		f_dl = request.files["dl"]
-		files = [f_aadhar,f_pan,f_dl]
+		files = [f_aadhar,f_passport,f_pan,f_dl]
 		no_of_files = 0
 		file_names = []
 		for no,f in enumerate(files):
 			
-			if f.filename == '' and no == 0:
+			if f.filename == '' and (no == 0 or no == 1):
 
-				return render_template('kyc_docs.html',context='Please upload Aadhar Card file')
+				return render_template('kyc_docs.html',context='Please upload Aadhar Card file and Latest Passport size image')
 		
 			elif check_fileextension(f.filename):
 				no_of_files = 1
 				f.filename = file_dict[no]+'.jpg'
 				file_names.append(f.filename)
 				f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
-				
+				if no == 1:
+					img = cv2.imread('images/passport.jpg')
+					img = face_extraction(img)
+					cv2.imwrite('images/face_extract.jpg',img)
+
 			elif no_of_files == 0:
 				aadhar_data = ()
 				return render_template('kyc_docs.html',context='Enter jpg or pdf')
