@@ -6,6 +6,7 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 import face_capture
 import model
+import get_aadhar_text
 
 app = Flask(__name__)
 
@@ -24,11 +25,7 @@ file_dict ={0:'aadhar',1:'pan',2:'dl'}
 def home_page():
 	return render_template('home.html')
 
-def check_fileextension(file):
-	if file.endswith('.pdf') or file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg'):
-		return True
-	else:
-		return False
+
 
 @app.route('/kyc_video',methods=['POST','GET'])
 def check_video_face():
@@ -40,6 +37,12 @@ def check_video_face():
 	else:
 		return render_template('video_kyc.html',context ='')
 
+def check_fileextension(file):
+	if file.endswith('.pdf') or file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg'):
+		return True
+	else:
+		return False
+
 @app.route("/kyc",methods=['POST','GET'])
 def check_kyc():
 	if request.method == "POST":
@@ -47,39 +50,31 @@ def check_kyc():
 		f_pan = request.files["pan"]
 		f_dl = request.files["dl"]
 		files = [f_aadhar,f_pan,f_dl]
+		no_of_files = 0
+		file_names = []
 		for no,f in enumerate(files):
 			
-			if f == '' and no == 0:
+			if f.filename == '' and no == 0:
 
-				return render_template('kyc_docs.html',context='Please upload a file')
+				return render_template('kyc_docs.html',context='Please upload Aadhar Card file')
 		
 			elif check_fileextension(f.filename):
-				
-				f.filename = file_dict[no]+'.'+f.filename.split('.')[1]
+				no_of_files = 1
+				f.filename = file_dict[no]+'.jpg'
+				file_names.append(f.filename)
 				f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
-			
-				return redirect(url_for('check_video_face'))
-		
-			else:
-			
+				
+			elif no_of_files == 0:
+				aadhar_data = ()
 				return render_template('kyc_docs.html',context='Enter jpg or pdf')
 
+		if no_of_files > 0:
+			aadhar_data = get_aadhar_text.get_data(os.path.join(BASE_DIR,'images',file_names[0]))
+			print(aadhar_data)
+			return redirect(url_for('check_video_face'))
+		
 	else:
 		return render_template('kyc_docs.html',context = '')
-
-def file_get(no,f):
-
-	if f == '' and no == 0:
-			return render_template('kyc_docs.html',context='Please upload a file')
-		
-	elif check_fileextension(f.filename):
-		f.filename = file_dict[no]+'.'+f.filename.split('.')[1]
-		f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
-			
-		return redirect(url_for('check_video_face'))
-		
-	else:
-		return render_template('kyc_docs.html',context='Enter jpg or pdf')
 
 	
 
