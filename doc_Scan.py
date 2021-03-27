@@ -65,7 +65,7 @@ def getWarp(img,biggest):
     return imgCropped
 
 if __name__ == '__main__':
-    img= cv2.imread('adhar.jpeg')
+    img= cv2.imread('trial_files_which_might_be_required\\adhar.jpeg')
     cv2.resize(img,(widthImg,heightImg))
     imgContour = img.copy()
 

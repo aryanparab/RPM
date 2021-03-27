@@ -1,29 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <div style="font-style:italic; font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">
-    <span><h1 style=text-align:center><p class="text-5xl"><a href="form.html"> RPM Bank</a></p></h1></span>
-    </div>
-    <link rel="stylesheet" href="form.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-    <script src="form.js"></script>
-    <style>
-			body {
-				background: url("https://wallpapercave.com/wp/wp4465114.jpg");
-        background-position: center;
-        background-size: cover;
-				background-repeat:no-repeat;
-				background-attachment: scroll;
-				font-family: Arial; 
-				color: black;
-			}
-			</style>
-</head>
-<body>
+{% extends 'home.html' %}
+{% block content %}
     <section class="text-black body-font overflow-hidden">
         <div class="container px-5 py-4 mx-auto">
           <div class="-my-8 divide-y-2 divide-gray-100">
@@ -35,17 +11,19 @@
               </div>
             </div>
           </section>
+    <form action ="/kyc" method="POST" enctype="multipart/form-data">
        <div class="container">
          <div class="row">
            <div class="col-sm-offset-2 col-sm-8"><br><br>
              <h5 style="background-color:rgb(255, 255, 255); font-size:100%;" ><b>Upload your Aadhar Card:</b></h5>
+
        <div class="form-group">
        <div class="input-group">
-         <input type="text" class="form-control" readonly>
+          <input type="text" class="form-control" readonly>
        <div class="input-group-btn">
          <span class="fileUpload btn btn-success">
              <span class="upl" id="upload">Upload file</span>
-             <input type="file" class="upload up" id="up" onchange="readURL(this);" />
+             <input type="file" class="upload up" name="aadhar" id="up" onchange="readURL(this);" />
            </span><!-- btn-orange -->
         </div><!-- btn -->
         </div><!-- group -->
@@ -63,7 +41,7 @@
          <div class="input-group-btn">
            <span class="fileUpload btn btn-success">
                <span class="upl" id="upload">Upload file</span>
-               <input type="file" class="upload up" id="up" onchange="readURL(this);" />
+               <input type="file" class="upload up" name ="pan" id="up" onchange="readURL(this);" />
              </span><!-- btn-orange -->
           </div><!-- btn -->
           </div><!-- group -->
@@ -77,11 +55,11 @@
                  <h5 style="background-color:rgb(255, 255, 255); font-size:100%;" ><b>Upload your Driving License:</b></h5>
            <div class="form-group">
            <div class="input-group">
-             <input type="text" class="form-control" readonly>
+              <input type="text" class="form-control" readonly>
            <div class="input-group-btn">
              <span class="fileUpload btn btn-success">
                  <span class="upl" id="upload">Upload file</span>
-                 <input type="file" class="upload up" id="up" onchange="readURL(this);" />
+                 <input type="file" class="upload up" name ="dl" id="up" onchange="readURL(this);" />
                </span><!-- btn-orange -->
             </div><!-- btn -->
             </div><!-- group -->
@@ -89,6 +67,10 @@
                  </div>
                </div>
              </div>  
-             <a href="kyc.html"><button type="button" class="btn btn-primary btn-block">Continue to video KYC.</button></a>
-</body>
+             <button type="submit" class="btn btn-primary btn-block">Continue to video KYC.</button>
+</form>
+                {% if context != '' %}
+                <h5>{{context}}</h5>
+                {% endif %}
+{% endblock %}
 </html>
