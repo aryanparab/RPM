@@ -76,27 +76,30 @@ def make_model():
     steps_per_epoch=len(training_set),
     validation_steps=len(test_set)
   )
- 
-  
-
-  img = image.load_img('images/face_extract.jpg', target_size=(224, 224))
-
-
-  x = image.img_to_array(img)
-  x = np.true_divide(x, 255)
-    ## Scaling
-#x=x/255
-  x = np.expand_dims(x, axis=0)
-
-  pred = model.predict(x)[0][0]
-  if pred > 0.5:
-    print("Picture verfication Failed!! Upload a more recent photo")
-  else:
-    print('picture verfication passed!!')
-  print(pred)
-  
-
   model.save('sface_recog.h5')
+  
+  def work(img):
+    x = image.img_to_array(img)
+    x = np.true_divide(x, 255)
+      ## Scaling
+      #x=x/255
+    x = np.expand_dims(x, axis=0)
+
+    pred = model.predict(x)[0][0]
+    if pred > 0.5:
+      print("Picture verfication Failed!! Upload a more recent photo")
+    else:
+      print('picture verfication passed!!')
+    print(pred)
+  
+
+
+  img = image.load_img('images/aadhar_face_extract.jpg', target_size=(224, 224))
+  work(img)
+
+
+
+
 
 
 
