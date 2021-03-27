@@ -24,10 +24,21 @@ def home_page():
 	return render_template('home_demo.html')
 
 def check_fileextension(file):
-	if file.split(".")[1] in ALLOWED_EXTENSIONS:
+	if file.endswith('.pdf') or file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg'):
 		return True
 	else:
 		return False
+
+@app.route('/kyc_video',methods=['POST','GET'])
+def check_video_face():
+	if request.method == "POST":
+		face_capture.perform()
+		model.make_model()
+
+		return render_template('kyc_video.html',context = "Model created Successfully")
+	else:
+		return render_template('kyc_video.html',context ='')
+
 @app.route("/kyc",methods=['POST','GET'])
 def check_kyc():
 	if request.method == "POST":
@@ -38,9 +49,8 @@ def check_kyc():
 		
 		elif check_fileextension(f.filename):
 			f.save(os.path.join(app.config['UPLOAD_FOLDER'],secure_filename(f.filename)))
-			face_capture.perform()
-			model.make_model()
-			return render_template('kyc_demo.html',context='File Uploaded Successfully')
+			
+			return redirect(url_for('check_video_face'))
 		
 		else:
 			return render_template('kyc_demo.html',context='Enter jpg or pdf')

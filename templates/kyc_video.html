@@ -1,0 +1,12 @@
+{% extends 'home_demo.html' %}
+{% block content %}
+<h3>Video Check</h3>
+<h5>We will scan ypur face for 20 seconds. Please be in appropriate lighting condition. This might take some time(around 5-10 minutes)</h5>
+<form action="/kyc_video" method="POST" enctype="multipart/form-data">
+	<h5>Hit start whenever Ready</h5>
+	<button type="submit">Start</button>
+</form>
+{% if context != '' %}
+<h5>{{context}}</h5>
+{% endif %}
+{% endblock %}
