@@ -1,5 +1,8 @@
 {% extends 'home.html' %}
     {% block content %}
+    {% if context != '' %}
+                <h5 class="font-medium title-font text-black mb-1 text-3xl">{{context}}</h5>
+                {% endif %}
     <section class="text-black body-font overflow-hidden">
         <div class="container px-5 py-4 mx-auto">
           <div class="-my-8 divide-y-2 divide-gray-100">
@@ -12,9 +15,6 @@
                 <form action="/kyc_video" method="POST" enctype="multipart/form-data">
                 <a href = '/loading'>  <button type="submit" class="btn btn-primary btn-block">Start.</button><a>
                 </form>
-                {% if context != '' %}
-                <h5 class="font-medium title-font text-black mb-1 text-3xl">{{context}}</h5>
-                {% endif %}
              
               </div>
             </div>
