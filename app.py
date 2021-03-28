@@ -149,16 +149,16 @@ def check_kyc():
 		if no_of_files > 0:
 	
 			print(aadhar_data)
-			# try:
-			# 	qr_data = get_qr_details.get_data(os.path.join(BASE_DIR,'images','aadhar.jpg'))
-			# 	print('QR data:  ',qr_data)
-			# 	status=validate_aadhar(aadhar_data,qr_data)
-			# 	if status['status']=="VERIFIED":
-			# 		return redirect(url_for('otp_thing'))
-			# 	else:
-			# 		return render_template('kyc_docs.html',context = status)
-			# except:
-			return redirect(url_for('otp_thing'))
+			try:
+				qr_data = get_qr_details.get_data(os.path.join(BASE_DIR,'images','aadhar.jpg'))
+				print('QR data:  ',qr_data)
+				status=validate_aadhar(aadhar_data,qr_data)
+				if status['status']=="VERIFIED":
+					return redirect(url_for('otp_thing'))
+				else:
+					return render_template('kyc_docs.html',context = status)
+			except:
+				return redirect(url_for('otp_thing'))
 	else:
 		return render_template('kyc_docs.html',context = '')
 

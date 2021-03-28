@@ -1,5 +1,17 @@
 {% extends 'home.html' %}
 {% block content %}
+{% if context != '' %}
+<div class="container">
+           <div class="row">
+             <div class="col-sm-offset-2 col-sm-8"><br><br>
+               <h5 style="background-color:rgb(255, 255, 255); font-size:75%;" ><b>{{context}}:</b></h5>
+        
+               </div>
+             </div>
+           </div>
+               
+                
+                {% endif %}
     <section class="text-black body-font overflow-hidden">
         <div class="container px-5 py-4 mx-auto">
           <div class="-my-8 divide-y-2 divide-gray-100">
@@ -8,6 +20,7 @@
                 <p class="leading-relaxed text-5xl"><u>Step 1: Upload official documents.</u></p>
                 <p class="leading-relaxed text-3xl">Uploading of Aadhar Card is mandatory.</p>
                 <p class="leading-relaxed text-3xl">Extra documents like your drivers license and pan card may be uploaded if you wish.</p>
+                <h3 class="leading-relaxed text-3xl">Please upload Aadhar Letter and not Aadhar ecard</h3>
               </div>
             </div>
           </section>
@@ -87,8 +100,6 @@
              </div>  
              <button type="submit" class="btn btn-primary btn-block">Continue to OTP verification.</button>
 </form>
-                {% if context != '' %}
-                <h5>{{context}}</h5>
-                {% endif %}
+ 
 {% endblock %}
 </html>
