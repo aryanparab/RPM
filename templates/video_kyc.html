@@ -10,7 +10,7 @@
                 <p class="leading-relaxed text-3xl">The video KYC process requirs you to position your face in front of the webcam for ten seconds.</p>
                 <p class="leading-relaxed text-3xl">We request you to begin with the video KYC process with ample time in hand because it will take about five minutes to complete</p>
                 <form action="/kyc_video" method="POST" enctype="multipart/form-data">
-                  <button type="button" class="btn btn-primary btn-block">Start.</button>
+                <a href = '/loading'>  <button type="submit" class="btn btn-primary btn-block">Start.</button><a>
                 </form>
                 {% if context != '' %}
                 <h5 class="font-medium title-font text-black mb-1 text-3xl">{{context}}</h5>

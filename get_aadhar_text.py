@@ -23,6 +23,7 @@ def get_data(img_file):
 	    return x[len(x)-1]
 
 	def getAno(text):
+	
 	    return re.findall('[0-9]{4}[ ][0-9]{4}[ ][0-9]{4}',text)[0]
 
 	def getDOB(text):

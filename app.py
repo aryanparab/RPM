@@ -6,11 +6,12 @@ from pathlib import Path
 from werkzeug.utils import secure_filename
 import face_capture
 import model
-import get_aadhar_text,get_pan_data , get_license_data
+import get_aadhar_text,get_pan_data , get_license_data, get_qr_details
 import cv2
 import send_otp
 from flask_session import Session
 import json
+from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
 
@@ -26,7 +27,7 @@ if os.path.isdir(os.path.join(BASE_DIR,file_to_store_upload_docs)) != True :
 
 UPLOAD_FOLDER= os.path.join(BASE_DIR,file_to_store_upload_docs)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-ALLOWED_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg']
+ALLOWED_EXTENSIONS = [ 'png', 'jpg', 'jpeg']
 file_dict ={0:'aadhar',1:'passport',2:'pan',3:'dl'}
 
 
@@ -48,22 +49,32 @@ def face_extraction(img):
 
 @app.route("/")
 def home_page():
-	return render_template('home.html')
+	return render_template('home.html',context='')
 
+@app.route('/success')
+def success():
+	return render_template('success.html',context = session.get('messages'))
 
+@app.route('/fail')
+def fail():
+	return render_template('fail.html',context = session.get('messages'))
 
 @app.route('/kyc_video',methods=['POST','GET'])
 def check_video_face():
 	if request.method == "POST":
 		face_capture.perform()
-		model.make_model()
+		val,session['messages'] = model.make_model()
+		if val :
+			
+			return redirect(url_for('success'))
+		else :
 
-		return render_template('video_kyc.html',context = "Model created Successfully")
+			return redirect(url_for('fail'))
 	else:
-		return render_template('video_kyc.html',context ='')
+		return render_template('video_kyc.html',context =session.get('messages'))
 
 def check_fileextension(file):
-	if file.endswith('.pdf') or file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg'):
+	if  file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg'):
 		return True
 	else:
 		return False
@@ -95,25 +106,39 @@ def check_kyc():
 					img = face_extraction(img)
 					aadhar_data = get_aadhar_text.get_data(os.path.join(BASE_DIR,'images',file_names[0]))
 					session['aadhar_phoneno'] = aadhar_data['Phone']
-					cv2.imwrite('images/aadhar_face_extract.jpg',img)
+					try:
+						cv2.imwrite('images/aadhar_face_extract.jpg',img)
+					except:
+						return render_template('kyc_docs.html',context='Upload proper documents')
+
 					print(aadhar_data)
 					new_file.write(str(aadhar_data))
 				elif no == 1:
 					img = cv2.imread('images/passport.jpg')
 					img = face_extraction(img)
-					cv2.imwrite('images/face_extract.jpg',img)
+					try:
+						cv2.imwrite('images/face_extract.jpg',img)
+					except:
+						return render_template('kyc_docs.html',context='Upload proper documents')
 				elif no == 2 and f.filename != '':
 					img = cv2.imread('images/pan.jpg')
 					img = face_extraction(img)
 					pan_data = get_pan_data.get_data(os.path.join(BASE_DIR,'images',file_names[2]))
-					cv2.imwrite('images/pan_face_extract.jpg',img)
+					try:
+						cv2.imwrite('images/pan_face_extract.jpg',img)
+					except:
+						return render_template('kyc_docs.html',context='Upload proper documents')
+
 					print(pan_data)
 					new_file.write(str(pan_data))
 				elif no == 3 and f.filename != '':
 					img = cv2.imread('images/dl.jpg')
 					img = face_extraction(img)
 					dl_data = get_license_data.get_data(os.path.join(BASE_DIR,'images',file_names[3]))
-					cv2.imwrite('images/dl_face_extract.jpg',img)
+					try:
+						cv2.imwrite('images/dl_face_extract.jpg',img)
+					except:
+						return render_template('kyc_docs.html',context='Upload proper documents')
 					print(dl_data)
 					new_file.write(str(dl_data))
 		
@@ -124,9 +149,16 @@ def check_kyc():
 		if no_of_files > 0:
 	
 			print(aadhar_data)
-			
-			return redirect(url_for('otp_thing'))
-		
+			try:
+				qr_data = get_qr_details.get_data(os.path.join(BASE_DIR,'images','aadhar.jpg'))
+				print('QR data:  ',qr_data)
+				status=validate_aadhar(aadhar_data,qr_data)
+				if status['status']=="VERIFIED":
+					return redirect(url_for('otp_thing'))
+				else:
+					return render_template('kyc_docs.html',context = status)
+			except:
+				return redirect(url_for('otp_thing'))
 	else:
 		return render_template('kyc_docs.html',context = '')
 
@@ -137,7 +169,7 @@ def otp_thing():
 	try:
 		correct_otp = send_otp.generate(session.get('aadhar_phoneno'))
 	except:
-		return render_template('home.html',context='Cant process because of some problem')
+		return render_template('home.html',context='Cant generate otp because of some problem')
 	count = 3
 	if request.method == 'POST':
 		otp_entered = request.form['otp']
@@ -145,6 +177,7 @@ def otp_thing():
 			count -=1
 			return render_template('kyc_otp.html',context='Incorrect OTP.{} more tries remaining'.format(count))
 		if count >=0 :
+			session['messages'] = 'OTP verfication complete!!'
 			return 	redirect(url_for('check_video_face'))
 		else:
 			return render_template('home.html',context='OTP Not matching.Please start again')
@@ -152,6 +185,22 @@ def otp_thing():
 
 		return render_template('kyc_otp.html',context='',no=phoneno)
 
+def validate_aadhar(aadhar_details,qr_details):
+    if fuzz.partial_ratio(aadhar_details['Aadhar No'],qr_details['Aadhar No'])<80:
+        print("INVALID AADHAR NO")
+        status="INVALID AADHAR NO"
+    elif fuzz.partial_ratio(aadhar_details['DOB'],qr_details['DOB'])<80:
+        print("INVALID DOB")
+        status="INVALID DOB"
+    elif fuzz.partial_ratio(aadhar_details['Gender'],qr_details['Gender'])<80:
+        print("INVALID GENDER")
+        status="INVALID GENDER"
+    else:
+        print("VERIFIED")
+        status="VERIFIED"
+    context={'status':status}
+    return context
+    
 @app.route("/aboutus")
 def aboutus():
 	return render_template('aboutus_demo.html')

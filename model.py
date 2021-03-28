@@ -76,9 +76,11 @@ def make_model():
     steps_per_epoch=len(training_set),
     validation_steps=len(test_set)
   )
+
   model.save('sface_recog.h5')
-  
-  def work(img):
+
+  def work(img,model):
+    
     x = image.img_to_array(img)
     x = np.true_divide(x, 255)
       ## Scaling
@@ -86,18 +88,32 @@ def make_model():
     x = np.expand_dims(x, axis=0)
 
     pred = model.predict(x)[0][0]
-    if pred > 0.5:
+    if pred < 0.5:
       print("Picture verfication Failed!! Upload a more recent photo")
+      return 0
     else:
       print('picture verfication passed!!')
+      return 1 
     print(pred)
   
-
-
-  img = image.load_img('images/aadhar_face_extract.jpg', target_size=(224, 224))
-  work(img)
-
-
+  count = []
+  no_count = [] 
+  total = 0
+  model = load_model('sface_recog.h5')
+  for i in ['images/aadhar_face_extract.jpg','images/dl_face_extract.jpg','images/pan_face_extract.jpg']:
+    
+    if os.path.exists(i):
+      total +=1 
+      img = image.load_img(i, target_size=(224, 224))
+      answer = work(img,model)
+      if answer == 1:
+        count.append(i)
+      else :
+        no_count.append(i)
+  if len(count) == total :
+    return [1,"All images match liev feed matching"]
+  elif len(count) < total :
+    return [0,'{} files images not matching'.format(no_count)]
 
 
 
