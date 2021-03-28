@@ -61,9 +61,14 @@ def fail():
 
 @app.route('/kyc_video',methods=['POST','GET'])
 def check_video_face():
+	obj = make_model()
 	if request.method == "POST":
-		face_capture.perform()
-		val,session['messages'] = model.make_model()
+		if not os.path.exists('sface_recong.h5'):
+
+			face_capture.perform()
+			val,session['messages'] = obj.train_model()
+		else:
+			val,session['messages'] = obj.start()
 		if val :
 			
 			return redirect(url_for('success'))
