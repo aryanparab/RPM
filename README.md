@@ -3,10 +3,6 @@
 RPM is a Flask-based prototype for document-based KYC (Know Your Customer) and face verification.  
 It supports uploading identity documents (Aadhar, PAN, DL, Passport), extracts text/QR data from them, performs a phone OTP check, and verifies that the photos on the documents match a live or uploaded face image using a CNN model (VGG16-based pipeline).
 
-> NOTE: I scanned the repository programmatically to build this README. The automatic listing may be incomplete; view the project in the GitHub UI for the full file tree: https://github.com/aryanparab/RPM
-
----
-
 ## Key features
 
 - Document upload endpoints (Aadhar, Passport, PAN, Driving Licence).
